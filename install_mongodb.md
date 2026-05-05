@@ -30,3 +30,4 @@ sudo nano /etc/mongod.conf
 
 bindIp: 127.0.0.1 er jaigay  bindIp: 0.0.0.0
 
+Restart the sudo systemctl restart mongod
