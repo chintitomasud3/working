@@ -11,3 +11,8 @@ sudo apt update
 sudo apt-get upgrade
 ## Install 
 sudo apt install -y mongodb-org
+
+
+## MongoDB start & enable
+sudo systemctl start mongod
+sudo systemctl enable mongod
