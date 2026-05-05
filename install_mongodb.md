@@ -16,3 +16,6 @@ sudo apt install -y mongodb-org
 ## MongoDB start & enable
 sudo systemctl start mongod
 sudo systemctl enable mongod
+
+## mongodb status check
+sudo systemctl status mongod
