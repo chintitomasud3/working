@@ -17,7 +17,9 @@ app.add_middleware(
 )
 
 # ---------------- MongoDB ----------------
-client = AsyncIOMotorClient("mongodb://localhost:27017")
+MONGO_URL = "mongodb://10.0.13.224:27017"
+
+client = AsyncIOMotorClient(MONGO_URL)
 db = client.my_database
 collection = db.users
 
@@ -26,7 +28,7 @@ collection = db.users
 class User(BaseModel):
     name: str
     email: str
-    age: int = None
+    age: int | None = None
 
 
 # ---------------- HTML PAGE ----------------
@@ -36,7 +38,7 @@ async def home():
 <!DOCTYPE html>
 <html>
 <head>
-    <title>FastAPI User Form</title>
+    <title>FastAPI MongoDB App</title>
     <style>
         body { font-family: Arial; max-width: 500px; margin: 50px auto; }
         input { width: 100%; padding: 10px; margin: 8px 0; }
@@ -52,13 +54,14 @@ async def home():
     <input type="text" id="name" placeholder="Name" required>
     <input type="email" id="email" placeholder="Email" required>
     <input type="number" id="age" placeholder="Age">
-    <button type="submit">Submit</button>
+
+    <button type="submit">Create</button>
 </form>
 
 <div id="result"></div>
 
 <script>
-document.getElementById("userForm").addEventListener("submit", async function(e) {
+document.getElementById("userForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const data = {
@@ -85,7 +88,7 @@ document.getElementById("userForm").addEventListener("submit", async function(e)
 """
 
 
-# ---------------- Create User ----------------
+# ---------------- CREATE USER ----------------
 @app.post("/users")
 async def create_user(user: User):
     result = await collection.insert_one(user.dict())
@@ -95,7 +98,7 @@ async def create_user(user: User):
     }
 
 
-# ---------------- Get Users ----------------
+# ---------------- GET ALL USERS ----------------
 @app.get("/users")
 async def get_users():
     users = []
@@ -106,3 +109,15 @@ async def get_users():
         users.append(user)
 
     return users
+
+
+# ---------------- GET SINGLE USER ----------------
+@app.get("/users/{user_id}")
+async def get_user(user_id: str):
+    user = await collection.find_one({"_id": ObjectId(user_id)})
+
+    if user:
+        user["_id"] = str(user["_id"])
+        return user
+
+    return {"message": "User not found"}
