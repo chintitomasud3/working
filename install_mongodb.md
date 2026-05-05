@@ -19,3 +19,8 @@ sudo systemctl enable mongod
 
 ## mongodb status check
 sudo systemctl status mongod
+
+
+##mongo mongoose shell check
+
+mongosh
