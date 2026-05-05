@@ -8,3 +8,4 @@ curl -fsSL https://pgp.mongodb.com/server-7.0.asc | \
 sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-7.0.gpg
 
 sudo apt update
+sudo apt-get upgrade
