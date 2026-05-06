@@ -1,38 +1,31 @@
-### Install Python + venv
+#!/bin/bash
 
-```bash
+set -e  # error hole stop korbe
+
+echo "🔄 Updating system..."
 sudo apt update
+
+echo "🐍 Installing Python & tools..."
 sudo apt install -y python3 python3-pip python3-venv
-```
 
----
-
-### Project setup
-
-```bash
-mkdir Backend
+echo "📁 Creating project directory..."
+mkdir -p Backend
 cd Backend
+
+echo "⚙️ Creating virtual environment..."
 python3 -m venv venv
+
+echo "🚀 Activating virtual environment..."
 source venv/bin/activate
-```
 
----
-
-### Install dependencies
-
-```bash
+echo "📦 Installing dependencies..."
+pip install --upgrade pip
 pip install fastapi uvicorn motor pydantic
-```
 
----
+echo "📝 Creating main.py..."
 
-### Run app
-
-```bash
-uvicorn main:app --host 0.0.0.0 --port 8000
-```
-
---- Backend folder main.py file hocce emon: from fastapi import FastAPI
+cat <<EOF > main.py
+from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -57,70 +50,16 @@ client = AsyncIOMotorClient(MONGO_URL)
 db = client.my_database
 collection = db.users
 
-
 # ---------------- Model ----------------
 class User(BaseModel):
     name: str
     email: str
     age: int | None = None
 
-
 # ---------------- HTML PAGE ----------------
 @app.get("/", response_class=HTMLResponse)
 async def home():
-    return """
-<!DOCTYPE html>
-<html>
-<head>
-    <title>FastAPI MongoDB App</title>
-    <style>
-        body { font-family: Arial; max-width: 500px; margin: 50px auto; }
-        input { width: 100%; padding: 10px; margin: 8px 0; }
-        button { width: 100%; padding: 10px; background: green; color: white; border: none; }
-        #result { margin-top: 15px; }
-    </style>
-</head>
-<body>
-
-<h2>Create User</h2>
-
-<form id="userForm">
-    <input type="text" id="name" placeholder="Name" required>
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="number" id="age" placeholder="Age">
-
-    <button type="submit">Create</button>
-</form>
-
-<div id="result"></div>
-
-<script>
-document.getElementById("userForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const data = {
-        name: document.getElementById("name").value,
-        email: document.getElementById("email").value,
-        age: document.getElementById("age").value ? Number(document.getElementById("age").value) : null
-    };
-
-    const res = await fetch("/users", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(data)
-    });
-
-    const result = await res.json();
-
-    document.getElementById("result").innerHTML =
-        "<pre>" + JSON.stringify(result, null, 2) + "</pre>";
-});
-</script>
-
-</body>
-</html>
-"""
-
+    return "<h2>FastAPI Running Successfully 🚀</h2>"
 
 # ---------------- CREATE USER ----------------
 @app.post("/users")
@@ -130,7 +69,6 @@ async def create_user(user: User):
         "id": str(result.inserted_id),
         "message": "User created successfully"
     }
-
 
 # ---------------- GET ALL USERS ----------------
 @app.get("/users")
@@ -144,7 +82,6 @@ async def get_users():
 
     return users
 
-
 # ---------------- GET SINGLE USER ----------------
 @app.get("/users/{user_id}")
 async def get_user(user_id: str):
@@ -154,4 +91,9 @@ async def get_user(user_id: str):
         user["_id"] = str(user["_id"])
         return user
 
-    return {"message": "User not found"} . now script baniye dao full
+    return {"message": "User not found"}
+EOF
+
+echo "🔥 Starting FastAPI server..."
+
+uvicorn main:app --host 0.0.0.0 --port 8000
